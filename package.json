@@ -1,0 +1,59 @@
+{
+  "name": "@red-dubrava/emitter",
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rslib build",
+    "watch": "rslib build --watch",
+    "lint": "eslint",
+    "format": "prettier --write .",
+    "test": "pnpm test:unit & pnpm test:type",
+    "test:unit": "vitest --run",
+    "test:bench": "vitest bench --run",
+    "test:type": "vitest --typecheck --run",
+    "prepare": "husky",
+    "prepublish": "pnpm build"
+  },
+  "devDependencies": {
+    "@ksv90/tools": "^0.0.1",
+    "@microsoft/api-extractor": "^7.52.8",
+    "@rslib/core": "^0.10.4",
+    "@types/node": "^22.15.34",
+    "eslint": "^9.30.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.10.1",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^5.5.1",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "husky": "^9.1.7",
+    "prettier": "^3.6.2",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.35.0",
+    "vitest": "^3.2.4"
+  },
+  "keywords": [
+    "event",
+    "emitter",
+    "event-emitter",
+    "eventemitter",
+    "decorator"
+  ],
+  "author": "red-dubrava",
+  "license": "ISC",
+  "packageManager": "pnpm@9.4.0",
+  "homepage": "https://github.com/red-dubrava/emitter",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/red-dubrava/emitter.git"
+  }
+}
