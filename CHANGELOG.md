@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.0](https://github.com/red-dubrava/emitter/compare/v0.0.1...v0.1.0) (2025-07-18)
+
+
+### Features
+
+* listener interfaces changed ([8ce1efc](https://github.com/red-dubrava/emitter/commit/8ce1efcbdd0fba75d0d7b77f39577dbc4b4a2149))
+* listener interfaces changed ([20f7b26](https://github.com/red-dubrava/emitter/commit/20f7b267224d676818ecdcdc816dfba8e264c73f))
+
 ## 0.0.1 (2025-06-28)
 
 
