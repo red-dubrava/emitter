@@ -27,9 +27,9 @@
   "devDependencies": {
     "@ksv90/tools": "^0.0.1",
     "@microsoft/api-extractor": "^7.52.8",
-    "@rslib/core": "^0.10.4",
-    "@types/node": "^22.15.34",
-    "eslint": "^9.30.0",
+    "@rslib/core": "^0.10.6",
+    "@types/node": "^22.16.4",
+    "eslint": "^9.31.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.10.1",
     "eslint-plugin-import": "^2.32.0",
@@ -38,7 +38,7 @@
     "husky": "^9.1.7",
     "prettier": "^3.6.2",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.35.0",
+    "typescript-eslint": "^8.37.0",
     "vitest": "^3.2.4"
   },
   "keywords": [

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { MEDIUM_PRIORITY } from '../constants';
-import { Emitter } from '../emitter';
-import { EmitterMixin } from '../mixin';
-import { IEmitter } from '../types';
+import { MEDIUM_PRIORITY } from './constants';
+import { Emitter } from './emitter';
+import { EmitterMixin } from './mixin';
+import { IEmitter } from './types';
 
 interface TestEmitterEvents {
   eventOne: number;
@@ -79,9 +79,8 @@ describe('emitter main tests', () => {
 
   it<Context>('должен иметь информацию о вызове', async ({ t1, t3 }) => {
     await new Promise<void>((resolve) => {
-      t1.on('eventOne', function (eventObject) {
-        const value = eventObject.data;
-        expect(value).toBeTypeOf('number');
+      t1.on('eventOne', function (eventData, eventObject) {
+        expect(eventData).toBeTypeOf('number');
         expect(eventObject.priority).toEqual(MEDIUM_PRIORITY);
         expect(eventObject.eventName).toEqual('eventOne');
         resolve();
@@ -91,9 +90,8 @@ describe('emitter main tests', () => {
     });
 
     await new Promise<void>((resolve) => {
-      t3.on('eventOne', function (eventObject) {
-        const value = eventObject.data;
-        expect(value).toBeTypeOf('number');
+      t3.on('eventOne', function (eventData, eventObject) {
+        expect(eventData).toBeTypeOf('number');
         expect(eventObject.priority).toEqual(MEDIUM_PRIORITY);
         expect(eventObject.eventName).toEqual('eventOne');
         resolve();
@@ -106,13 +104,9 @@ describe('emitter main tests', () => {
   it<Context>('должен передавать данные', async ({ t1, t3 }) => {
     const value = 1;
 
-    interface EventData {
-      data: number;
-    }
-
     await new Promise<void>((resolve) => {
-      function listener({ data }: EventData) {
-        expect(data).toEqual(value);
+      function listener(eventData: number) {
+        expect(eventData).toEqual(value);
         resolve();
       }
 
@@ -122,8 +116,8 @@ describe('emitter main tests', () => {
     });
 
     await new Promise<void>((resolve) => {
-      function listener({ data }: EventData) {
-        expect(data).toEqual(value);
+      function listener(eventData: number) {
+        expect(eventData).toEqual(value);
         resolve();
       }
 
@@ -141,7 +135,7 @@ describe('emitter main tests', () => {
     }
 
     await new Promise<void>((resolve) => {
-      function listener(eventObject: EventContext) {
+      function listener(_: unknown, eventObject: EventContext) {
         const { value } = eventObject.context;
         expect(value).toEqual(context.value);
         resolve();
@@ -153,7 +147,7 @@ describe('emitter main tests', () => {
     });
 
     await new Promise<void>((resolve) => {
-      function listener(eventObject: EventContext) {
+      function listener(_: unknown, eventObject: EventContext) {
         const { value } = eventObject.context;
         expect(value).toEqual(context.value);
         resolve();
@@ -177,8 +171,8 @@ describe('emitter main tests', () => {
   it<Context>('должен вызвать событие', ({ t1, t3 }) => {
     let resultValue = 0;
 
-    const listener = ({ data }: { data: number }) => {
-      resultValue += data;
+    const listener = (eventData: number) => {
+      resultValue += eventData;
     };
 
     t1.on('eventOne', listener);
@@ -263,11 +257,11 @@ describe('emitter main tests', () => {
   it<Context>('должен передавать правильные данные', ({ t1 }) => {
     let testOne: unknown = null;
     let testTwo: unknown = null;
-    t1.on('eventOne', ({ data }) => {
-      testOne = data;
+    t1.on('eventOne', (eventData) => {
+      testOne = eventData;
     });
-    t1.on('eventTwo', ({ data }) => {
-      testTwo = data;
+    t1.on('eventTwo', (eventData) => {
+      testTwo = eventData;
     });
     t1.emit('eventOne', 1);
     t1.emit('eventTwo', '');
@@ -277,8 +271,8 @@ describe('emitter main tests', () => {
 
   it<Context>('должен вызвать обработчики в порядке добавления', ({ t1 }) => {
     let value = 2;
-    t1.on('eventOne', ({ data }) => (value += data));
-    t1.on('eventOne', ({ data }) => (value *= data));
+    t1.on('eventOne', (eventData) => (value += eventData));
+    t1.on('eventOne', (eventData) => (value *= eventData));
     t1.emit('eventOne', 2);
     expect(value).toBe(8);
   });
@@ -290,74 +284,74 @@ describe('emitter main tests', () => {
       value = 2;
     };
 
-    t1.on('eventOne', ({ data }) => (value += data), { priority: 'low' });
-    t1.on('eventOne', ({ data }) => (value *= data));
+    t1.on('eventOne', (eventData) => (value += eventData), { priority: 'low' });
+    t1.on('eventOne', (eventData) => (value *= eventData));
     t1.emit('eventOne', 2);
     expect(value).toBe(6);
 
     clear();
-    t1.on('eventOne', ({ data }) => (value += data), { priority: 'low' });
-    t1.on('eventOne', ({ data }) => (value *= data), { priority: 'medium' });
+    t1.on('eventOne', (eventData) => (value += eventData), { priority: 'low' });
+    t1.on('eventOne', (eventData) => (value *= eventData), { priority: 'medium' });
     t1.emit('eventOne', 2);
     expect(value).toBe(6);
 
     clear();
-    t1.on('eventOne', ({ data }) => (value += data), { priority: 'low' });
-    t1.on('eventOne', ({ data }) => (value *= data), { priority: 'high' });
+    t1.on('eventOne', (eventData) => (value += eventData), { priority: 'low' });
+    t1.on('eventOne', (eventData) => (value *= eventData), { priority: 'high' });
     t1.emit('eventOne', 2);
     expect(value).toBe(6);
 
     clear();
-    t1.on('eventOne', ({ data }) => (value += data), { priority: 'medium' });
-    t1.on('eventOne', ({ data }) => (value *= data), { priority: 'high' });
+    t1.on('eventOne', (eventData) => (value += eventData), { priority: 'medium' });
+    t1.on('eventOne', (eventData) => (value *= eventData), { priority: 'high' });
     t1.emit('eventOne', 2);
     expect(value).toBe(6);
 
     clear();
-    t1.on('eventOne', ({ data }) => (value += data));
-    t1.on('eventOne', ({ data }) => (value *= data), { priority: 'high' });
+    t1.on('eventOne', (eventData) => (value += eventData));
+    t1.on('eventOne', (eventData) => (value *= eventData), { priority: 'high' });
     t1.emit('eventOne', 2);
     expect(value).toBe(6);
 
     clear();
-    t1.on('eventOne', ({ data }) => (value += data), { priority: 'medium' });
-    t1.on('eventOne', ({ data }) => (value *= data));
+    t1.on('eventOne', (eventData) => (value += eventData), { priority: 'medium' });
+    t1.on('eventOne', (eventData) => (value *= eventData));
     t1.emit('eventOne', 2);
     expect(value).toBe(8);
 
     clear();
-    t1.on('eventOne', ({ data }) => (value += data), { priority: 'high' });
-    t1.on('eventOne', ({ data }) => (value *= data));
+    t1.on('eventOne', (eventData) => (value += eventData), { priority: 'high' });
+    t1.on('eventOne', (eventData) => (value *= eventData));
     t1.emit('eventOne', 2);
     expect(value).toBe(8);
 
     clear();
-    t1.on('eventOne', ({ data }) => (value += data));
-    t1.on('eventOne', ({ data }) => (value *= data), { priority: 'low' });
+    t1.on('eventOne', (eventData) => (value += eventData));
+    t1.on('eventOne', (eventData) => (value *= eventData), { priority: 'low' });
     t1.emit('eventOne', 2);
     expect(value).toBe(8);
 
     clear();
-    t1.on('eventOne', ({ data }) => (value += data));
-    t1.on('eventOne', ({ data }) => (value *= data), { priority: 'medium' });
+    t1.on('eventOne', (eventData) => (value += eventData));
+    t1.on('eventOne', (eventData) => (value *= eventData), { priority: 'medium' });
     t1.emit('eventOne', 2);
     expect(value).toBe(8);
 
     clear();
-    t1.on('eventOne', ({ data }) => (value += data), { priority: 'medium' });
-    t1.on('eventOne', ({ data }) => (value *= data), { priority: 'low' });
+    t1.on('eventOne', (eventData) => (value += eventData), { priority: 'medium' });
+    t1.on('eventOne', (eventData) => (value *= eventData), { priority: 'low' });
     t1.emit('eventOne', 2);
     expect(value).toBe(8);
 
     clear();
-    t1.on('eventOne', ({ data }) => (value += data), { priority: 'high' });
-    t1.on('eventOne', ({ data }) => (value *= data), { priority: 'low' });
+    t1.on('eventOne', (eventData) => (value += eventData), { priority: 'high' });
+    t1.on('eventOne', (eventData) => (value *= eventData), { priority: 'low' });
     t1.emit('eventOne', 2);
     expect(value).toBe(8);
 
     clear();
-    t1.on('eventOne', ({ data }) => (value += data), { priority: 'high' });
-    t1.on('eventOne', ({ data }) => (value *= data), { priority: 'medium' });
+    t1.on('eventOne', (eventData) => (value += eventData), { priority: 'high' });
+    t1.on('eventOne', (eventData) => (value *= eventData), { priority: 'medium' });
     t1.emit('eventOne', 2);
     expect(value).toBe(8);
   });
@@ -370,7 +364,7 @@ describe('emitter main tests', () => {
       value = 2;
     };
 
-    const multiply = ({ data }: { data: number }) => (value *= data);
+    const multiply = (eventData: number) => (value *= eventData);
 
     t1.on('eventOne', multiply, { priority: 'low' });
     t1.on('eventOne', multiply, { priority: 'medium' });
@@ -380,7 +374,7 @@ describe('emitter main tests', () => {
     clear();
     t1.on('eventOne', multiply, { priority: 'high' });
     t1.on('eventOne', multiply, { priority: 'low' });
-    t1.on('eventOne', ({ data }) => (value += data), { priority: 'medium' });
+    t1.on('eventOne', (eventData) => (value += eventData), { priority: 'medium' });
     t1.emit('eventOne', 2);
     expect(value).toBe(8);
   });
