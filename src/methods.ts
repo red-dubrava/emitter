@@ -32,22 +32,23 @@ export function removeListener<TEvents extends object, TEventName extends keyof 
 
 export function emit<TEvents extends object, TEventName extends keyof TEvents>(
   this: IEmitterLite<TEvents>,
-  eventName: TEventName,
-  data: TEvents[TEventName],
+  ...args: TEvents[TEventName] extends undefined ? [eventName: TEventName] : [eventName: TEventName, eventData: TEvents[TEventName]]
 ): boolean {
+  const [eventName, eventData] = args as [eventName: TEventName, eventData: TEvents[TEventName]];
   const listenerEventNameMap = getMapByTarget<TEvents, TEventName, object | undefined>(this);
   const listenerMap = listenerEventNameMap.get(eventName);
   if (!listenerMap) return false;
   let hasListener = false;
   for (const [listener, options] of listenerMap.entries()) {
     const { priority = MEDIUM_PRIORITY, context, guard, once } = options ?? {};
-    if (!(guard?.(data) ?? true)) continue;
+    if (!(guard?.(eventData) ?? true)) continue;
     hasListener = true;
     if (once) {
       listenerMap.delete(listener);
       if (!listenerMap.size) listenerEventNameMap.delete(eventName);
     }
-    listener({ eventName, listener, priority, data, context });
+
+    listener(eventData, { eventName, listener, priority, context });
   }
   return hasListener;
 }

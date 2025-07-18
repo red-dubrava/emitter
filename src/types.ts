@@ -3,6 +3,7 @@ import type { HIGH_PRIORITY, LOW_PRIORITY, MEDIUM_PRIORITY } from './constants';
 export type Priority = typeof LOW_PRIORITY | typeof MEDIUM_PRIORITY | typeof HIGH_PRIORITY;
 
 export type Listener<TEventName extends PropertyKey, TData, TContext extends object | undefined = undefined> = (
+  eventData: TData,
   eventObject: EventObject<TEventName, TData, TContext>,
 ) => void;
 
@@ -12,7 +13,6 @@ export interface EventObject<TEventName extends PropertyKey, TData, TContext ext
   readonly eventName: TEventName;
   readonly listener: Listener<TEventName, TData>;
   readonly priority: Priority;
-  readonly data: TData;
   readonly context: NoInfer<TContext>;
 }
 
@@ -41,7 +41,9 @@ export interface IEmitterLite<TEvents extends object> {
 }
 
 export interface IEmitter<TEvents extends object> extends IEmitterLite<TEvents> {
-  emit<TEventName extends keyof TEvents>(eventName: TEventName, eventData: TEvents[TEventName]): boolean;
+  emit<TEventName extends keyof TEvents>(
+    ...args: TEvents[TEventName] extends undefined ? [eventName: TEventName] : [eventName: TEventName, eventData: TEvents[TEventName]]
+  ): boolean;
   addListener<TEventName extends keyof TEvents, TContext extends object | undefined = undefined>(
     eventName: TEventName,
     listener: Listener<TEventName, TEvents[TEventName], TContext>,

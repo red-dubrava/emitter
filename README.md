@@ -21,8 +21,8 @@ interface MyEvents {
 
 const emitter = new Emitter<MyEvents>();
 
-emitter.on('click', ({ data }) => {
-  console.log(`x: ${data.x}; y: ${data.y}`);
+emitter.on('click', ({ x, y }) => {
+  console.log(`x: ${x}; y: ${y}`);
 });
 
 emitter.emit('click', { x: 1, y: 2 });
@@ -41,8 +41,8 @@ class InheritanceEmitter extends Emitter<MyEvents> {}
 
 const emitter = new InheritanceEmitter();
 
-emitter.on('click', ({ data }) => {
-  console.log(`x: ${data.x}; y: ${data.y}`);
+emitter.on('click', ({ x, y }) => {
+  console.log(`x: ${x}; y: ${y}`);
 });
 
 emitter.emit('click', { x: 1, y: 2 });
@@ -64,8 +64,8 @@ class DecoratedEmitter implements IEmitter<MyEvents> {}
 
 const emitter = new DecoratedEmitter();
 
-emitter.on('click', ({ data }) => {
-  console.log(`click position ${data.x}:${data.y}`);
+emitter.on('click', ({ x, y }) => {
+  console.log(`click position ${x}:${y}`);
 });
 
 emitter.emit('click', { x: 1, y: 2 });
@@ -73,12 +73,24 @@ emitter.emit('click', { x: 1, y: 2 });
 emitter instanceof Emitter; // true
 ```
 
+## EventData
+
+Data passed to the event
+
+```ts
+emitter.on('click', (eventData) => {
+  console.log(eventData); // 42, from emit
+});
+
+emitter.emit(42);
+```
+
 ## EventObject
 
 The emitter adds an event object to the handler to receive additional data at the time of the call.
 
 ```ts
-emitter.on('click', (eventObject) => {
+emitter.on('click', (_eventData, eventObject) => {
   console.log(eventObject);
 });
 ```
@@ -94,7 +106,7 @@ emitter.on('click', ({ eventName }) => {
 - listener - the processing function that is currently being called (for example, you can unsubscribe from an event)
 
 ```ts
-const fn = ({ listener }: { listener: () => void }) => {
+const fn = (_, { listener }: { listener: () => void }) => {
   console.log(listener === fn); // true
 };
 emitter.on('click', fn);
@@ -103,7 +115,7 @@ emitter.on('click', fn);
 - priority - handler call priority ("low" | "medium" | "high")
 
 ```ts
-const priorityLog = ({ priority }) => {
+const priorityLog = (_, { priority }) => {
   console.log(priority);
 };
 
@@ -112,22 +124,12 @@ emitter.on('click', priorityLog); // default 'medium'
 emitter.on('click', priorityLog, { priority: 'low' }); // 'low'
 ```
 
-- data - data passed to the event
-
-```ts
-emitter.on('click', ({ data }) => {
-  console.log(data); // 42, from emit
-});
-
-emitter.emit(42);
-```
-
 - context - additional call context
 
 ```ts
 const self = { value: 100 };
 
-const fn = ({ context }: { context: { value: number } }) => {
+const fn = (_, { context }: { context: { value: number } }) => {
   console.log(context === self); // true
 };
 
@@ -184,3 +186,53 @@ emitter.addListener('click', fn, { once: true });
 - on - alias for addListener with option once: false
 - once - alias for addListener with option once: true
 - off - alias for removeListener
+
+## Examples
+
+1. Events without data
+
+```ts
+interface EmitterEvents {
+  counter: number;
+  click: undefined;
+}
+
+const emitter = new Emitter<EmitterEvents>();
+
+emitter.on('counter', (eventData) => {
+  console.log(eventData); // 42
+});
+
+emitter.on('click', (eventData) => {
+  console.log(eventData); // undefined
+});
+
+emitter.emit('counter', 42); // ok
+
+emitter.emit('counter'); // error, missing data
+
+emitter.emit('click'); // ok
+```
+
+2. Data tuple and data object
+
+```ts
+interface EmitterEvents {
+  click: { x: number; y: number };
+  counter: [current: number, prev: number];
+}
+
+const emitter = new Emitter<EmitterEvents>();
+
+emitter.on('click', ({ x, y }) => {
+  console.log(x, y); // 1, 2
+});
+
+emitter.on('counter', ([current, prev]) => {
+  console.log(current, prev); // 2, 1
+});
+
+emitter.emit('click', { x: 1, y: 2 });
+
+emitter.emit('counter', [2, 1]);
+```
