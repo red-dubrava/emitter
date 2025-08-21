@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.1](https://github.com/red-dubrava/emitter/compare/v0.1.0...v0.1.1) (2025-08-21)
+
+
+### Bug Fixes
+
+* constructor name fixed ([996d5fb](https://github.com/red-dubrava/emitter/commit/996d5fba13442b52d8b3033e219eaff250ec695e))
+* constructor name fixed ([a79ab45](https://github.com/red-dubrava/emitter/commit/a79ab45b7a94b19483d1dc6c624bb8dbd1957654))
+
 ## [0.1.0](https://github.com/red-dubrava/emitter/compare/v0.0.1...v0.1.0) (2025-07-18)
 
 
