@@ -82,7 +82,7 @@ emitter.on('click', (eventData) => {
   console.log(eventData); // 42, from emit
 });
 
-emitter.emit(42);
+emitter.emit('click', 42);
 ```
 
 ## EventObject
