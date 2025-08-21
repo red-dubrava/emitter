@@ -35,7 +35,7 @@ export const EmitterMixin = <TEvents extends object, TConstructor extends Constr
     emitterPrototype.once = once;
     emitterPrototype.off = off;
 
-    Object.defineProperty(Emitter, 'name', { value: `${Target.name}Emitter` });
+    Object.defineProperty(Emitter, 'name', { value: Target.name });
 
     return Emitter;
   };
